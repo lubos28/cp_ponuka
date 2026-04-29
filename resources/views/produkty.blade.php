@@ -9,7 +9,7 @@ aj s uchytenim
     <style>
         :root { --dorken: #003399; --bg: #f8f9fa; --success: #28a745; --danger: #dc3545; }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; font-size: 13px; overflow: hidden; /* Zakáže skrolovanie celého okna */ }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; font-size: 13px; overflow: hidden; }
         
         /* FIXNÁ HORNÁ ČASŤ */
         .fixed-header {
@@ -21,9 +21,50 @@ aj s uchytenim
             z-index: 1000;
         }
 
-        .navbar { background: var(--dorken); color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-weight: bold; opacity: 0.8; }
+        /* ZJEDNOTENÝ NAVBAR */
+     .navbar {
+        background: var(--dorken);
+        color: #fff;
+        padding: 10px 0; /* Kompaktná výška */
+    }
+
+    .navbar-inner {
+        max-width: 1500px; /* Zjednotená šírka na 1500px */
+        margin: auto;
+        padding: 0 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .navbar-inner b {
+        font-size: 14px; /* Logo Dörken */
+    }
+
+    .nav-links a {
+        color: #fff;
+        text-decoration: none;
+        margin-left: 20px;
+        font-weight: bold;
+        font-size: 11px; /* Malé, čisté písmo */
+        opacity: .8;
+    }
+
+    .nav-links a.active {
+        opacity: 1 !important;
+        border-bottom: 2px solid white;
+        padding-bottom: 2px;
+    }
+
+        .nav-links a:hover { opacity: 1; }
         
+        /* AKTÍVNY PRVOK - PRODUKTY */
+        .nav-links a.active { 
+            opacity: 1 !important; 
+            border-bottom: 2px solid white; 
+            padding-bottom: 2px; 
+        }
+
         .container-tools { 
             max-width: 1550px; 
             margin: 0 auto; 
@@ -77,7 +118,7 @@ aj s uchytenim
 
         /* SKROLOVACIA ČASŤ S TABUĽKOU */
         .scrollable-content {
-            margin-top: 215px; /* Výška fixnej časti - doladiť podľa potreby */
+            margin-top: 215px; 
             height: calc(100vh - 215px);
             overflow-y: auto;
             max-width: 1550px;
@@ -89,7 +130,6 @@ aj s uchytenim
 
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
 
-        /* FIXNÁ HLAVIČKA TABUĽKY */
         thead th {
             position: sticky;
             top: 0;
@@ -104,56 +144,56 @@ aj s uchytenim
         td { padding: 10px; border-bottom: 1px solid #eee; }
         .td-info { text-align: center; width: 40px; }
         
-       .info-icon {
-    position: relative; /* DÔLEŽITÉ pre správne umiestnenie tooltipu */
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center;
-    color: var(--dorken); 
-    cursor: help; 
-    font-weight: bold; 
-    font-size: 14px;
-    background: #eef2f7; 
-    width: 24px; 
-    height: 24px; 
-    border-radius: 50%;
-}
+        .info-icon {
+            position: relative;
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            color: var(--dorken); 
+            cursor: help; 
+            font-weight: bold; 
+            font-size: 14px;
+            background: #eef2f7; 
+            width: 24px; 
+            height: 24px; 
+            border-radius: 50%;
+        }
 
-.info-icon:hover::after {
-    content: attr(data-info); 
-    position: absolute; 
-    pointer-events: none;
-    bottom: 130%; 
-    left: 50%; 
-    transform: translateX(-50%);
-    background: #333; 
-    color: #fff; 
-    padding: 10px; 
-    border-radius: 6px;
-    width: 250px; 
-    white-space: normal; 
-    z-index: 9999; /* Zvýšili sme na maximum, aby bol nad všetkým */
-    font-size: 11px; 
-    font-weight: normal;
-    line-height: 1.4;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    
-}
+        .info-icon:hover::after {
+            content: attr(data-info); 
+            position: absolute; 
+            pointer-events: none;
+            bottom: 130%; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: #333; 
+            color: #fff; 
+            padding: 10px; 
+            border-radius: 6px;
+            width: 250px; 
+            white-space: normal; 
+            z-index: 9999;
+            font-size: 11px; 
+            font-weight: normal;
+            line-height: 1.4;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
 
 <div class="fixed-header">
     <div class="navbar">
-        <b>DÖRKEN</b>
-        <div class="nav-links">
-            <a href="{{ url('/ponuka') }}">NOVÁ PONUKA</a>
-            <a href="{{ url('/produkty') }}">SKLAD</a>
-            <a href="{{ url('/archiv') }}">ARCHÍV</a>  
+        <div class="navbar-inner">
+            <b>DÖRKEN</b>
+            <div class="nav-links">
+                <a href="{{ url('/ponuka') }}">PONUKA</a>
+                <a href="{{ url('/zakaznici') }}">ZÁKAZNÍCI</a>
+                <a href="{{ url('/produkty') }}" class="active">PRODUKTY</a>
+                <a href="{{ url('/archiv') }}">ARCHÍV</a>
             </div>
-    </div>
-
-    <div class="container-tools">
+        </div>
+    </div> <div class="container-tools">
         <div class="action-bar">
             <h2 style="margin:0; color:var(--dorken)">Sklad produktov</h2>
             <div class="management-tools">

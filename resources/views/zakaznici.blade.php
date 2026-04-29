@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Databáza zákazníkov | DÖRKEN</title>
     <style>
+   
+
+
         :root {
             --dorken: #003399;
             --bg: #f0f2f5;
@@ -11,98 +14,38 @@
 
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; font-size: 13px; }
         
-        .navbar { 
-            background: var(--dorken); 
-            color: white; 
-            display: flex; 
-            justify-content: center; 
-            padding: 12px 0; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
+        .navbar {
+            background: var(--dorken);
+            color: #fff;
+            padding: 10px 0; /* Kompaktná výška */
         }
-        
+
         .navbar-inner {
-            width: 100%;
-            max-width: 1550px;
+            max-width: 1500px; /* Zjednotená šírka na 1500px */
+            margin: auto;
+            padding: 0 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 25px;
+        }
+
+        .navbar-inner b {
+            font-size: 14px; /* Logo Dörken */
         }
 
         .nav-links a {
-            color: white;
+            color: #fff;
             text-decoration: none;
             margin-left: 20px;
             font-weight: bold;
+            font-size: 11px; /* Malé, čisté písmo */
             opacity: .8;
         }
 
-        .nav-links a:hover { opacity: 1; }
-        .nav-links a.active { opacity: 1; border-bottom: 2px solid white; }
-
-        .container { max-width: 1550px; margin: 20px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        
-        .add-box { background: #f8f9fa; border: 1px solid #ddd; padding: 20px; border-radius: 6px; margin-bottom: 30px; }
-        .btn-save { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #343a40; color: white; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #eee; transition: background 0.3s; }
-        tr:hover { background: #f1f7ff; }
-
-        /* Štýl pre editovateľnú bunku */
-        [contenteditable="true"]:focus {
-            outline: 2px solid var(--dorken);
-            background: white;
-            padding: 5px;
-            border-radius: 3px;
-        }
-
-        .badge { background: #fffde7; border: 1px solid #ffd600; padding: 3px 7px; border-radius: 3px; font-weight: bold; color: #856404; }
-        .alert-success { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #c3e6cb; }
-        
-            
-    
-    </style>
-</head>
-    <style>
-        :root {
-            --dorken: #003399;
-            --bg: #f0f2f5;
-        }
-
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; font-size: 13px; }
-        
-        .navbar { 
-            background: var(--dorken); 
-            color: white; 
-            display: flex; 
-            justify-content: center; 
-            padding: 12px 0; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
-        }
-        
-        .navbar-inner {
-            width: 100%;
-            max-width: 1550px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 25px;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 20px;
-            font-weight: bold;
-            opacity: .8;
+        .nav-links a.active {
+            opacity: 1 !important;
+            border-bottom: 2px solid white;
+            padding-bottom: 2px;
         }
 
         .nav-links a:hover { opacity: 1; }
@@ -171,15 +114,17 @@
 
 <body>
 
-<nav class="navbar">
-    <div class="navbar-inner">
-        <b>DÖRKEN</b>
-        <div class="nav-links">
-            <a href="{{ url('/') }}">CENOVÉ PONUKY</a>
-            <a href="{{ url('/produkty') }}">PRODUKTY</a>
-            <a href="{{ url('/zakaznici') }}" class="active">ZÁKAZNÍCI</a>
-            <a href="{{ url('/archiv') }}">ARCHÍV</a>
+<div class="navbar">
+        <div class="navbar-inner">
+            <b>DÖRKEN</b>
+            <div class="nav-links">
+                <a href="{{ url('/ponuka') }}">PONUKA</a>
+                <a href="{{ url('/zakaznici') }}" class="active">ZÁKAZNÍCI</a>
+                <a href="{{ url('/produkty') }}">PRODUKTY</a>
+                <a href="{{ url('/archiv') }}">ARCHÍV</a>
+            </div>
         </div>
+    
     </div>
 </nav>
 

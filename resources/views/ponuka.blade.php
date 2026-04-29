@@ -35,28 +35,36 @@
 
         .navbar {
             background: var(--dorken);
-            color: white;
-            display: flex;
-            justify-content: center;
-            padding: 8px 0;
+            color: #fff;
+            padding: 10px 0; /* Kompaktná výška */
         }
 
         .navbar-inner {
-            width: 100%;
-            max-width: 1550px;
+            max-width: 1500px; /* Zjednotená šírka na 1500px */
+            margin: auto;
+            padding: 0 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 25px;
+        }
+
+        .navbar-inner b {
+            font-size: 14px; /* Logo Dörken */
         }
 
         .nav-links a {
-            color: white;
+            color: #fff;
             text-decoration: none;
             margin-left: 20px;
             font-weight: bold;
+            font-size: 11px; /* Malé, čisté písmo */
             opacity: .8;
-            font-size: 11px;
+        }
+
+        .nav-links a.active {
+            opacity: 1 !important;
+            border-bottom: 2px solid white;
+            padding-bottom: 2px;
         }
 
         .header-content {
@@ -258,8 +266,6 @@
 </head>
 <body>
 
-   <body>
-
 <div id="app-lock" style="
     display:none;
     position:fixed;
@@ -276,83 +282,84 @@
     ⏳ Ukladám ponuku...
 </div>         
 
-                        <input type="hidden" id="existujuce_id" value="{{ $ponuka->id ?? '' }}">
+<input type="hidden" id="existujuce_id" value="{{ $ponuka->id ?? '' }}">
 
-                        <div class="sticky-header">
-                            <div class="navbar">
-                                <div class="navbar-inner">
-                                    <b>DÖRKEN</b>
-                                    <div class="nav-links">
-                                        <a href="{{ url('/produkty') }}">PRODUKTY</a>
-                                        <a href="{{ url('/zakaznici') }}">ZÁKAZNÍCI</a>
-                                        <a href="{{ url('/archiv') }}">ARCHÍV</a>
-                                    </div>
-                                </div>
-                            </div>
+<div class="sticky-header">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <b>DÖRKEN</b>
+           <div class="nav-links">
+                <a href="{{ url('/ponuka') }}" class="active">PONUKA</a>
+                <a href="{{ url('/zakaznici') }}">ZÁKAZNÍCI</a>
+                <a href="{{ url('/produkty') }}">PRODUKTY</a>
+                <a href="{{ url('/archiv') }}">ARCHÍV</a>
+            </div>
+        </div>
+    </div>
 
-                            <div class="header-content">
-                          <div class="action-bar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
-                            <h3 style="margin:0;color:var(--dorken)">
-                                {{ isset($ponuka) ? 'Úprava ponuky #' . $ponuka->id : 'Nová cenová ponuka' }}
-                            </h3>
-                            
-                            <div class="action-buttons" style="display: flex; gap: 10px;">
-                                <button class="btn-pdf" onclick="generatePDF()" style="padding: 8px 15px; cursor: pointer;">🖨 PDF / Tlač</button>
-                                
-                                @if(isset($ponuka))
-                                    <button onclick="saveOffer(true)" style="background: #ffc107; color: #000; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
-                                        🔄 AKTUALIZOVAŤ (Prepísať)
-                                    </button>
-                                    <button onclick="saveOffer(false)" style="background: #17a2b8; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
-                                        ➕ ULOŽIŤ AKO NOVÚ
-                                    </button>
-                                @else
-                                    <button id="mainSaveBtn" onclick="saveOffer(false)" style="background: #28a745; color: white; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer;">
-                                        💾 ULOŽIŤ PONUKU
-                                    </button>
-                                @endif      
-                                    </div>
-                            </div>
+    <div class="header-content">
+        <div class="action-bar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;">
+            <h3 style="margin:0;color:var(--dorken)">
+                {{ isset($ponuka) ? 'Úprava ponuky #' . $ponuka->id : 'Nová cenová ponuka' }}
+            </h3>
+            
+            <div class="action-buttons" style="display: flex; gap: 10px;">
+                <button class="btn-pdf" onclick="generatePDF()" style="padding: 8px 15px; cursor: pointer;">🖨 PDF / Tlač</button>
+                
+                @if(isset($ponuka))
+                    <button onclick="saveOffer(true)" style="background: #ffc107; color: #000; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                        🔄 AKTUALIZOVAŤ (Prepísať)
+                    </button>
+                    <button onclick="saveOffer(false)" style="background: #17a2b8; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                        ➕ ULOŽIŤ AKO NOVÚ
+                    </button>
+                @else
+                    <button id="mainSaveBtn" onclick="saveOffer(false)" style="background: #28a745; color: white; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                        💾 ULOŽIŤ PONUKU
+                    </button>
+                @endif      
+            </div>
+        </div>
 
-                                <div class="compact-header" style="display: flex; gap: 15px; align-items: flex-end; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin: 10px 20px;">
-                                    
-                                    <div style="flex: 4; position: relative;">
-                                        <label style="display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #555;">ZÁKAZNÍK (MENO / MESTO)</label>
-                                        <input type="text" id="klient" autocomplete="off" 
-                                            placeholder="Hľadať klienta..." 
-                                            value="{{ $ponuka->customer_name ?? '' }}"
-                                            oninput="searchCustomer(this)" 
-                                            onkeydown="navigateCustomer(event)"
-                                            onfocus="this.select(); searchCustomer(this)"
-                                            style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                        <div id="customer-results" class="search-results" style="position: absolute; width: 100%; z-index: 1001;"></div>
-                                    </div>
+        <div class="compact-header" style="display: flex; gap: 15px; align-items: flex-end; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin: 10px 20px;">
+            
+            <div style="flex: 4; position: relative;">
+                <label style="display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #555;">ZÁKAZNÍK (MENO / MESTO)</label>
+                <input type="text" id="klient" autocomplete="off" 
+                    placeholder="Hľadať klienta..." 
+                    value="{{ $ponuka->customer_name ?? '' }}"
+                    oninput="searchCustomer(this)" 
+                    onkeydown="navigateCustomer(event)"
+                    onfocus="this.select(); searchCustomer(this)"
+                    style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                <div id="customer-results" class="search-results" style="position: absolute; width: 100%; z-index: 1001;"></div>
+            </div>
 
-                                    <div style="flex: 3;">
-                                        <label style="display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #555;">NÁZOV PROJEKTU / POZNÁMKA</label>
-                                        <input type="text" id="nazov_ponuky" 
-                                            placeholder="napr. RD Stupava" 
-                                            value="{{ $ponuka->title ?? '' }}"
-                                            style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                                    </div>
+            <div style="flex: 3;">
+                <label style="display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #555;">NÁZOV PROJEKTU / POZNÁMKA</label>
+                <input type="text" id="nazov_ponuky" 
+                    placeholder="napr. RD Stupava" 
+                    value="{{ $ponuka->title ?? '' }}"
+                    style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
 
-                                    <div style="width: 70px;">
-                                        <label style="display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #555;">ZĽAVA Z%</label>
-                                        <input type="number" id="z_zaklad" 
-                                            value="{{ $ponuka->discount_base ?? 0 }}" 
-                                            oninput="applyGlobal()" 
-                                            style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
-                                    </div>
+            <div style="width: 70px;">
+                <label style="display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #555;">ZĽAVA Z%</label>
+                <input type="number" id="z_zaklad" 
+                    value="{{ $ponuka->discount_base ?? 0 }}" 
+                    oninput="applyGlobal()" 
+                    style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
+            </div>
 
-                                    <div style="width: 70px;">
-                                        <label style="display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #555;">ZĽAVA O%</label>
-                                        <input type="number" id="z_objem" 
-                                            value="{{ $ponuka->discount_vol ?? 0 }}" 
-                                            oninput="applyGlobal()" 
-                                            style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
-                                    </div>
-                                </div>
-                            </div>
+            <div style="width: 70px;">
+                <label style="display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #555;">ZĽAVA O%</label>
+                <input type="number" id="z_objem" 
+                    value="{{ $ponuka->discount_vol ?? 0 }}" 
+                    oninput="applyGlobal()" 
+                    style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
+            </div>
+        </div>
+    </div>
 
 
 

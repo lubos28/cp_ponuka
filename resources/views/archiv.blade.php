@@ -22,31 +22,39 @@ body{
     font-size:13px;
 }
 
-.navbar{
-    background:var(--dorken);
-    color:#fff;
-    padding:10px 0;
+.navbar {
+    background: var(--dorken);
+    color: #fff;
+    padding: 10px 0; /* Kompaktná výška */
 }
 
-.navbar-inner{
-    max-width:1500px;
-    margin:auto;
-    padding:0 25px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+.navbar-inner {
+    max-width: 1500px; /* Zjednotená šírka na 1500px */
+    margin: auto;
+    padding: 0 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.nav-links a{
-    color:#fff;
-    text-decoration:none;
-    margin-left:20px;
-    font-weight:bold;
-    font-size:11px;
-    opacity:.8;
+.navbar-inner b {
+    font-size: 14px; /* Logo Dörken */
 }
 
-.nav-links a.active{opacity:1;}
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: bold;
+    font-size: 11px; /* Malé, čisté písmo */
+    opacity: .8;
+}
+
+.nav-links a.active {
+    opacity: 1 !important;
+    border-bottom: 2px solid white;
+    padding-bottom: 2px;
+}
 
 .container{
     max-width:1500px;
@@ -162,7 +170,7 @@ tr:hover{
     <div class="navbar-inner">
         <b>DÖRKEN</b>
         <div class="nav-links">
-            <a href="{{ url('/ponuka') }}">NOVÁ PONUKA</a>
+            <a href="{{ url('/ponuka') }}">PONUKA</a>
             <a href="{{ url('/zakaznici') }}">ZÁKAZNÍCI</a>
             <a href="{{ url('/produkty') }}">PRODUKTY</a>
             <a href="{{ url('/archiv') }}" class="active">ARCHÍV</a>
