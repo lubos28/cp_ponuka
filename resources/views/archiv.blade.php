@@ -8,11 +8,17 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <style>
+
+.action-delete {
+    font-size: 14px;
+}
+
 :root{
     --dorken:#003399;
     --bg:#f8f9fa;
     --border:#dee2e6;
     --danger:#dc3545;
+    --success:#198754;
 }
 
 body{
@@ -22,38 +28,38 @@ body{
     font-size:13px;
 }
 
-.navbar {
-    background: var(--dorken);
-    color: #fff;
-    padding: 10px 0; /* Kompaktná výška */
+.navbar{
+    background:var(--dorken);
+    color:#fff;
+    padding:10px 0;
 }
 
-.navbar-inner {
-    max-width: 1500px; /* Zjednotená šírka na 1500px */
-    margin: auto;
-    padding: 0 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.navbar-inner{
+    max-width:1500px;
+    margin:auto;
+    padding:0 25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.navbar-inner b {
-    font-size: 14px; /* Logo Dörken */
+.navbar-inner b{
+    font-size:14px;
 }
 
-.nav-links a {
-    color: #fff;
-    text-decoration: none;
-    margin-left: 20px;
-    font-weight: bold;
-    font-size: 11px; /* Malé, čisté písmo */
-    opacity: .8;
+.nav-links a{
+    color:#fff;
+    text-decoration:none;
+    margin-left:20px;
+    font-weight:bold;
+    font-size:11px;
+    opacity:.8;
 }
 
-.nav-links a.active {
-    opacity: 1 !important;
-    border-bottom: 2px solid white;
-    padding-bottom: 2px;
+.nav-links a.active{
+    opacity:1 !important;
+    border-bottom:2px solid white;
+    padding-bottom:2px;
 }
 
 .container{
@@ -131,27 +137,48 @@ tr:hover{
 .price{
     text-align:right;
     font-weight:bold;
-    color:#198754;
+    color:var(--success);
 }
 
 .actions{
     display:flex;
     justify-content:flex-end;
-    gap:5px;
+    align-items:center;
+    gap:10px;
 }
 
-.btn{
-    width:28px;
-    height:28px;
-    border:1px solid #ccc;
-    background:white;
-    border-radius:4px;
+.action-view,
+.action-pdf,
+.action-xls,
+.action-delete{
+    font-size:12px;
+    font-weight:bold;
+    text-decoration:none;
     cursor:pointer;
-    font-size:13px;
+    white-space:nowrap;
 }
 
-.btn:hover{
-    border-color:var(--dorken);
+.action-view{
+    color:var(--dorken);
+}
+
+.action-pdf{
+    color:var(--danger);
+}
+
+.action-xls{
+    color:var(--success);
+}
+
+.action-delete{
+    color:var(--danger);
+}
+
+.action-view:hover,
+.action-pdf:hover,
+.action-xls:hover,
+.action-delete:hover{
+    text-decoration:underline;
 }
 
 .filter-input{
@@ -236,11 +263,40 @@ tr:hover{
                         
                         {{-- 7. Akcie --}}
                         <td>
-                            <div class="actions">
-                                <a href="{{ url('/archiv/detail/'.$p->id) }}"><button class="btn" onclick="event.stopPropagation()">👁</button></a>
-                                <button class="btn" onclick="event.stopPropagation(); deleteSingle({{ $p->id }})">🗑</button>
-                            </div>
-                        </td>
+                            
+            <td>
+                <div class="actions" style="display:flex; gap:10px; justify-content:flex-end; align-items:center;">
+
+                    <a href="{{ url('/archiv/detail/'.$p->id) }}" 
+                    onclick="event.stopPropagation()" 
+                    class="action-view">
+                        Detail
+                    </a>
+
+                    <a href="{{ url('/ponuka/pdf/'.$p->id) }}" 
+                    target="_blank" 
+                    onclick="event.stopPropagation()" 
+                    class="action-pdf">
+                        PDF
+                    </a>
+
+                    <a href="{{ url('/ponuka/excel/'.$p->id) }}" 
+                    target="_blank" 
+                    onclick="event.stopPropagation()" 
+                    class="action-xls">
+                        XLS
+                    </a>
+
+                   <a href="#" 
+                       onclick="event.stopPropagation(); deleteSingle({{ $p->id }}); return false;" 
+                        class="action-delete" 
+                        title="Vymazať">
+                        🗑
+                    </a>
+
+                </div>
+            </td>
+
                     </tr>
                 @endforeach
             </tbody>

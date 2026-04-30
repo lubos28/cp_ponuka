@@ -303,22 +303,29 @@
                 {{ isset($ponuka) ? 'Úprava ponuky #' . $ponuka->id : 'Nová cenová ponuka' }}
             </h3>
             
-            <div class="action-buttons" style="display: flex; gap: 10px;">
-                <button class="btn-pdf" onclick="generatePDF()" style="padding: 8px 15px; cursor: pointer;">🖨 PDF / Tlač</button>
+           <div class="action-buttons" style="display: flex; gap: 7px; align-items: center;">
+                <button class="btn-pdf" onclick="generatePDF()" style="padding: 7px 12px; cursor: pointer; font-size: 11px;">
+                    🖨 PDF
+                </button>
+
+                <button onclick="exportExcel()" style="background: #198754; color: #fff; border: none; padding: 7px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;">
+                    📊 EXCEL
+                </button>
                 
                 @if(isset($ponuka))
-                    <button onclick="saveOffer(true)" style="background: #ffc107; color: #000; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
-                        🔄 AKTUALIZOVAŤ (Prepísať)
+                    <button onclick="saveOffer(true)" style="background: #ffc107; color: #000; border: none; padding: 7px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;">
+                        🔄 PREPÍSAŤ
                     </button>
-                    <button onclick="saveOffer(false)" style="background: #17a2b8; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
-                        ➕ ULOŽIŤ AKO NOVÚ
+
+                    <button onclick="saveOffer(false)" style="background: #17a2b8; color: #fff; border: none; padding: 7px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;">
+                        ➕ AKO NOVÚ
                     </button>
                 @else
-                    <button id="mainSaveBtn" onclick="saveOffer(false)" style="background: #28a745; color: white; border: none; padding: 8px 20px; border-radius: 4px; font-weight: bold; cursor: pointer;">
-                        💾 ULOŽIŤ PONUKU
+                    <button id="mainSaveBtn" onclick="saveOffer(false)" style="background: #28a745; color: white; border: none; padding: 7px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;">
+                        💾 ULOŽIŤ
                     </button>
                 @endif      
-            </div>
+            </div> 
         </div>
 
         <div class="compact-header" style="display: flex; gap: 15px; align-items: flex-end; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin: 10px 20px;">
@@ -984,6 +991,18 @@ function showToast(message) {
     setTimeout(() => {
         toast.remove();
     }, 2000);
+}
+
+//export excel
+function exportExcel() {
+    const id = document.getElementById('existujuce_id').value;
+
+    if (!id) {
+        alert("Najprv ulož ponuku.");
+        return;
+    }
+
+    window.open("{{ url('/ponuka/excel') }}/" + id, "_blank");
 }
 </script>
 </body>
