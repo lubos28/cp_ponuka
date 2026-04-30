@@ -20,23 +20,21 @@ Route::get('/ponuka', [PonukaController::class, 'index']);
 Route::post('/save-ponuka', [PonukaController::class, 'store']);
 Route::get('/archiv', [PonukaController::class, 'archiv']);
 
-// Vymazanie ponuky z archívu (PRIDANÉ)
+// Vymazanie ponuky z archívu
 Route::delete('/delete-ponuka/{id}', [PonukaController::class, 'delete']);
 Route::post('/delete-multiple-ponuky', [PonukaController::class, 'deleteMultiple']);
 
-
-// Detail a PDF
+// Detail, PDF a Excel
 Route::get('/archiv/detail/{id}', [PonukaController::class, 'show']);
-Route::get('/ponuka/pdf/{id}', [PonukaController::class, 'generatePdf']);
-Route::post('/archiv/update-title', [PonukaController::class, 'updateTitle']); // <--- TOTO PRIDAJ
-
+Route::get('/ponuka/pdf/{id}', [PonukaController::class, 'generatePdf'])->name('ponuka.pdf');
+Route::get('/ponuka/excel/{id}', [PonukaController::class, 'exportExcel'])->name('ponuka.excel');
+Route::post('/archiv/update-title', [PonukaController::class, 'updateTitle']);
 
 // --- PRODUKTY (Sklad) ---
 Route::get('/produkty', [ProductController::class, 'index']);
 Route::get('/search-products', [ProductController::class, 'search']); 
 Route::post('/produkty/import', [ProductController::class, 'import']);
 Route::post('/produkty/reset', [ProductController::class, 'reset']); 
-
 
 // --- ZÁKAZNÍCI ---
 Route::get('/zakaznici', [ZakaznikController::class, 'index']);

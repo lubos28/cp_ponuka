@@ -348,6 +348,7 @@
                 <input type="number" id="z_zaklad" 
                     value="{{ $ponuka->discount_base ?? 0 }}" 
                     oninput="applyGlobal()" 
+                    onfocus="this.select()"
                     style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
             </div>
 
@@ -356,6 +357,7 @@
                 <input type="number" id="z_objem" 
                     value="{{ $ponuka->discount_vol ?? 0 }}" 
                     oninput="applyGlobal()" 
+                    onfocus="this.select()"
                     style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-align: center;">
             </div>
         </div>
@@ -580,6 +582,7 @@ function addRow() {
                 <span class="info-sub" id="ean-${rowId}">Kód: -</span>
             </div>
         </td>
+
         <td style="width:8%">
             <input type="number" class="p-qty" value="0" step="any" 
                 oninput="calc(${rowId})" 
@@ -589,12 +592,34 @@ function addRow() {
             <span class="info-sub" id="pack-${rowId}">bal: -</span>
             <input type="hidden" class="p-pack" value="1">
         </td>
-        <td style="width:10%"><input type="number" class="p-price" value="0.00" step="0.01" oninput="calc(${rowId})"></td>
-        <td style="width:8%"><input type="number" class="p-z1" value="${document.getElementById('z_zaklad').value}" oninput="calc(${rowId})"></td>
-        <td style="width:8%"><input type="number" class="p-z2" value="${document.getElementById('z_objem').value}" oninput="calc(${rowId})"></td>
-        <td style="width:16%"><span class="p-total" style="font-weight:bold">0.00</span> €</td>
-        <td style="width:5%"><button tabindex="-1" onclick="removeRow(${rowId})" style="border:none; background:none; color:red; cursor:pointer">✕</button></td>
+
+        <td style="width:10%">
+            <input type="number" class="p-price" value="0.00" step="0.01" oninput="calc(${rowId})">
+        </td>
+
+        <td style="width:8%">
+            <input type="number" class="p-z1" 
+                value="${document.getElementById('z_zaklad').value}" 
+                oninput="calc(${rowId})"
+                onfocus="this.select()">
+        </td>
+
+        <td style="width:8%">
+            <input type="number" class="p-z2" 
+                value="${document.getElementById('z_objem').value}" 
+                oninput="calc(${rowId})"
+                onfocus="this.select()">
+        </td>
+
+        <td style="width:16%">
+            <span class="p-total" style="font-weight:bold">0.00</span> €
+        </td>
+
+        <td style="width:5%">
+            <button tabindex="-1" onclick="removeRow(${rowId})" style="border:none; background:none; color:red; cursor:pointer">✕</button>
+        </td>
     `;
+
     document.getElementById('tbody').appendChild(tr);
     return tr;
 }
@@ -658,17 +683,23 @@ function searchProducts(input, id) {
 }
 
 function selectProduct(p, id) {
+
     const row = document.getElementById(`row-${id}`);
+    row.dataset.productId = p.id || null;
     row.dataset.fullProduct = JSON.stringify(p);
     row.querySelector('.p-name').value = `${p.nazov} /${p.Rozmer || ''}/`;
     row.querySelector('.p-price').value = parseFloat(p.cena_mj || 0).toFixed(2);
+    row.querySelector('.p-price').readOnly = true;
+   
     const pack = parseFloat(String(p.rozmer_balenie ?? 1).replace(',', '.')) || 1;
     row.querySelector('.p-pack').value = pack;
     row.querySelector('.p-qty').value = pack;
     document.getElementById(`ean-${id}`).innerText = 'EAN: ' + (p.id_vyrobok || '-');
     document.getElementById(`pack-${id}`).innerText = 'bal: ' + (p.mn_cele_balenie || '-');
     document.getElementById(`res-${id}`).style.display = 'none';
+    
     calc(id);
+    
     setTimeout(() => {
         const qty = row.querySelector('.p-qty');
         qty.focus(); qty.select();
@@ -808,7 +839,6 @@ function generatePDF() {
 }
 
 function saveOffer(prepisat = false) {
-
     lockUI();
 
     const btn = document.activeElement;
@@ -820,8 +850,10 @@ function saveOffer(prepisat = false) {
         btn.innerHTML = "⏳ Ukladám...";
     }
 
-    // 1. ID ponuky
+    // 1. KĽÚČOVÁ ZMENA: ID ponuky
     let idZDB = document.getElementById('existujuce_id').value;
+    // Ak prepisujeme, pošleme ID. Ak ukladáme ako novú, pošleme null, 
+    // aby Laravel v controllery spravil $offer = new Offer();
     let idPosielane = prepisat ? idZDB : null;
 
     // 2. klient
@@ -829,70 +861,71 @@ function saveOffer(prepisat = false) {
     if (!menoKlienta) {
         alert("Prosím, vyberte alebo zadajte meno klienta.");
         unlockUI();
+        if (btn) { btn.disabled = false; btn.innerHTML = originalBtnText; }
         return;
     }
 
-    // 3. položky
+    // 3. položky (oprava selektora na tvoj #tbody)
     const polozky = [];
     document.querySelectorAll('#tbody tr').forEach(tr => {
         const nazovInput = tr.querySelector('.p-name');
         if (nazovInput && nazovInput.value.trim() !== "") {
             polozky.push({
+                product_id: tr.dataset.productId || null, // Pridané ID produktu
                 nazov: nazovInput.value,
                 mnozstvo: tr.querySelector('.p-qty').value.replace(',', '.'),
                 cena_mj: tr.querySelector('.p-price').value.replace(',', '.'),
                 z1: tr.querySelector('.p-z1').value || 0,
                 z2: tr.querySelector('.p-z2').value || 0,
-                spolu: tr.querySelector('.p-total').innerText.replace(/\s/g, '').replace(',', '.'),
-                full_data: tr.dataset.fullProduct ? JSON.parse(tr.dataset.fullProduct) : null
+                spolu: tr.querySelector('.p-total').innerText.replace(/\s/g, '').replace(',', '.').replace('€', ''),
+                full_data: tr.dataset.fullProduct || null
             });
         }
     });
 
-    // 4. request data
+    // 4. request data (zjednotené s názvami v controllery)
     const data = {
         _token: "{{ csrf_token() }}",
-        existujuce_id: idPosielane,
+        existujuce_id: idPosielane, // Toto posielame do Laravelu
         prepisat: prepisat,
         zakaznik_meno: menoKlienta,
         nazov_ponuky: document.getElementById('nazov_ponuky').value,
         zlava_zaklad: document.getElementById('z_zaklad').value || 0,
         zlava_objem: document.getElementById('z_objem').value || 0,
-        celkova_suma: document.getElementById('grandTotal').innerText.replace(/\s/g, '').replace(',', '.'),
+        celkova_suma: document.getElementById('grandTotal').innerText.replace(/\s/g, '').replace(',', '.').replace('€', ''),
         polozky: polozky
     };
 
-    // 5. SAVE
+    // 5. SAVE - použi presne URL z web.php
     axios.post("{{ url('/save-ponuka') }}", data)
         .then(res => {
-
             if (res.data.success) {
-
-                const id = res.data.id;
-
-                window.open("{{ url('/ponuka/pdf') }}/" + id, '_blank');
-
                 showToast("Ponuka uložená ✔");
+                document.getElementById('existujuce_id').value = res.data.id;
+                
+                // Otvoríme PDF v novom okne
+                
 
                 setTimeout(() => {
                     window.location.href = "{{ url('/archiv') }}";
                 }, 600);
             }
-
         })
-        .catch(err => {
-            console.error(err);
-            alert("Chyba pri ukladaní.");
-        })
-        .finally(() => {
+    .catch(err => {
+        console.log("CELA CHYBA:", err);
+         console.log("ODPOVED:", err.response);
+        console.log("DATA:", err.response?.data);
 
+        alert("Chyba pri ukladaní: " + (err.response?.data?.message || err.message));
+    })
+    
+    .finally(() => {
             if (btn && btn.tagName === 'BUTTON') {
                 btn.disabled = false;
                 btn.innerHTML = originalBtnText || "💾 ULOŽIŤ PONUKU";
             }
-
             unlockUI();
-        });
+    });
 }
 
 
@@ -920,16 +953,7 @@ document.addEventListener('keydown', function(e) {
         hideAllResults();
     }
 });
-function hideAllResults() {
-    // Schováme výsledky zákazníka
-    const custResults = document.getElementById('customer-results');
-    if (custResults) custResults.style.display = 'none';
 
-    // Schováme všetky výsledky produktov v riadkoch
-    document.querySelectorAll('.search-results').forEach(box => {
-        box.style.display = 'none';
-    });
-}
 
 function lockUI() {
     document.getElementById('app-lock').style.display = 'flex';
@@ -937,6 +961,29 @@ function lockUI() {
 
 function unlockUI() {
     document.getElementById('app-lock').style.display = 'none';
+}
+
+function showToast(message) {
+    let toast = document.createElement("div");
+
+    toast.innerText = message;
+
+    toast.style.position = "fixed";
+    toast.style.bottom = "20px";
+    toast.style.right = "20px";
+    toast.style.background = "#28a745";
+    toast.style.color = "#fff";
+    toast.style.padding = "10px 15px";
+    toast.style.borderRadius = "5px";
+    toast.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
+    toast.style.zIndex = "99999";
+    toast.style.fontSize = "13px";
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 2000);
 }
 </script>
 </body>

@@ -6,141 +6,168 @@ use Illuminate\Http\Request;
 use App\Models\Ponuka;
 use App\Models\PonukaItem;
 use Illuminate\Support\Facades\DB;
+// Pre PDF
 use Barryvdh\DomPDF\Facade\Pdf;
+// Pre Excel
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class PonukaController extends Controller
-{
-    public function store(Request $request)
     {
-        try {
-            DB::beginTransaction();
+        public function index()
+        {
+            $zakaznici = \App\Models\Zakaznik::all(); 
+            return view('ponuka', compact('zakaznici'));
+}
 
-            // 1. Zistíme, či vytvárame novú ponuku alebo upravujeme existujúcu
-            // (Zatiaľ tvoj JS posiela len nové, ale tu sme pripravení na update)
-            if ($request->has('existujuce_id') && $request->existujuce_id) {
-                $ponuka = Ponuka::find($request->existujuce_id);
+public function archiv()
+        {
+            $ponuky = Ponuka::orderBy('created_at', 'desc')->get();
+            return view('archiv', compact('ponuky'));
+}
 
-                if (!$ponuka) {
-                    $ponuka = new Ponuka();
-                } else {
-                    $ponuka->polozky()->delete();
-                }
-            } else {
-                $ponuka = new Ponuka();
-            }
+public function show($id)
+        {
+            $ponuka = Ponuka::with('polozky')->findOrFail($id);
+            $zakaznici = \App\Models\Zakaznik::all(); 
+            return view('ponuka', compact('ponuka', 'zakaznici'));
+}
 
-            // 2. Uložíme hlavnú ponuku (Hlavička)
-            $ponuka->customer_name = $request->zakaznik_meno; 
-            
-            // --- TOTO JE TO NOVÉ POLE ---
-            $ponuka->title = $request->nazov_ponuky; 
-            
-            $ponuka->customer_data = $request->zakaznik_data; 
-            $ponuka->discount_base = $request->zlava_zaklad ?? 0;
-            $ponuka->discount_vol = $request->zlava_objem ?? 0;
-            
-            // Očistenie sumy od medzier a čiarky pre DB (decimal format)
-            $total = str_replace(',', '.', str_replace(' ', '', $request->celkova_suma));
-            $ponuka->total_sum = (float)$total;
-            
-            $ponuka->status = 'active';
-            $ponuka->save();
-            $ponuka->refresh();
-
-            // 3. Uložíme položky
-            if ($request->has('polozky') && is_array($request->polozky)) {
-                foreach ($request->polozky as $item) {
-                    $pItem = new PonukaItem();
-                    $pItem->offer_id = $ponuka->id; 
-                    $pItem->product_name = $item['nazov'];
-                    $pItem->product_data = $item['full_data']; 
-                    
-                    $pItem->quantity = (float)str_replace(',', '.', $item['mnozstvo']);
-                    $pItem->price_mj = (float)str_replace(',', '.', $item['cena_mj']);
-                    $pItem->z_zaklad = $item['z1'] ?? 0;
-                    $pItem->z_objekt = $item['z2'] ?? 0;
-                    
-                    $rowTotal = str_replace(',', '.', str_replace(' ', '', $item['spolu']));
-                    $pItem->row_total = (float)$rowTotal;
-                    $pItem->save();
-                }
-            }
-
-            DB::commit();
-            return response()->json(['success' => true, 'id' => $ponuka->id]);
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
-    }
-
-    // Vymazanie ponuky
-   // Premenuj metódu z destroy na delete (aby sedela s web.php)
-public function delete($id)
-{
+public function store(Request $request)
+    {
     try {
-        $ponuka = Ponuka::findOrFail($id);
-        $ponuka->polozky()->delete(); // Zmaže položky (ak máš nastavený vzťah)
-        $ponuka->delete();
+        DB::beginTransaction();
 
-        return response()->json(['success' => true]);
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        if ($request->prepisat && $request->existujuce_id) {
+            $ponuka = Ponuka::find($request->existujuce_id);
+            if (!$ponuka) $ponuka = new Ponuka();
+        } else {
+            $ponuka = new Ponuka();
+        }
+
+        // Mapovanie hlavnej ponuky (tabuľka offers)
+        $ponuka->customer_name = $request->zakaznik_meno;
+        $ponuka->title         = $request->nazov_ponuky;
+        $ponuka->discount_base = $request->zlava_zaklad ?? 0;
+        $ponuka->discount_vol  = $request->zlava_objem ?? 0;
+        $ponuka->total_sum     = $request->celkova_suma;
+        $ponuka->status        = 'draft';
+        $ponuka->save();
+
+        if ($request->has('polozky')) {
+            // Vymažeme staré položky
+            $ponuka->polozky()->delete(); 
+            
+            foreach ($request->polozky as $p) {
+                // Mapovanie položiek (tabuľka offer_items)
+                $ponuka->polozky()->create([
+                    'product_name' => $p['nazov'],     // z JS 'nazov' -> do DB 'product_name'
+                    'quantity'     => $p['mnozstvo'],  // z JS 'mnozstvo' -> do DB 'quantity'
+                    'price_mj'     => $p['cena_mj'],   // z JS 'cena_mj' -> do DB 'price_mj'
+                    'z_zaklad'     => $p['z1'] ?? 0,   // z JS 'z1' -> do DB 'z_zaklad'
+                    'z_objekt'     => $p['z2'] ?? 0,   // z JS 'z2' -> do DB 'z_objekt'
+                    'row_total'    => $p['spolu'],     // z JS 'spolu' -> do DB 'row_total'
+                    'product_data' => $p['full_data'] ?? null,
+        ]);
     }
 }
 
-// Pridaj chýbajúcu metódu pre hromadné mazanie
+DB::commit();
+
+return response()->json([
+            'success' => true,
+            'id'      => $ponuka->id,
+            'message' => $request->prepisat ? 'Ponuka aktualizovaná' : 'Nová ponuka vytvorená'
+    ]);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'success' => false, 
+            'message' => 'Chyba v DB: ' . $e->getMessage()
+        ], 500);
+    }
+}      
+
+public function exportExcel($id)
+    {
+    $ponuka = Ponuka::with('polozky')->findOrFail($id);
+    $templatePath = storage_path('app/templates/template_cp.xlsx');
+
+    if (!file_exists($templatePath)) {
+        return abort(404, 'Šablóna sa nenašla.');
+    }
+
+    $spreadsheet = IOFactory::load($templatePath);
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Hlavné údaje
+    $sheet->setCellValue('M3', $ponuka->id . '/2026');
+    $sheet->setCellValue('B10', $ponuka->customer_name); 
+    $sheet->setCellValue('B11', $ponuka->title);
+
+    // Položky
+    $startRow = 15; 
+    foreach ($ponuka->polozky as $index => $polozka) {
+        $currentRow = $startRow + $index;
+        
+        $sheet->setCellValue('A' . $currentRow, $index + 1);
+        $sheet->setCellValue('B' . $currentRow, $polozka->product_name); // ZMENA na product_name
+        $sheet->setCellValue('G' . $currentRow, $polozka->quantity);     // ZMENA na quantity
+        $sheet->setCellValue('H' . $currentRow, $polozka->price_mj);
+        $sheet->setCellValue('J' . $currentRow, $polozka->z_zaklad . '%'); // ZMENA na z_zaklad
+        $sheet->setCellValue('L' . $currentRow, $polozka->row_total);    // ZMENA na row_total
+    }
+
+    $sheet->setCellValue('L45', $ponuka->total_sum); 
+
+    $fileName = "Ponuka_" . $ponuka->id . ".xlsx";
+    return response()->streamDownload(function () use ($spreadsheet) {
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
+    }, $fileName, [
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ]);
+}
+
+public function generatePdf($id)
+    {
+        // Načítame ponuku aj s anglickými položkami
+        $ponuka = Ponuka::with('polozky')->findOrFail($id);
+        
+        // DÔLEŽITÉ: V blade súbore pdf_tlac.blade.php musíš teraz 
+        // používať {{ $polozka->product_name }} namiesto {{ $polozka->nazov }}
+        $pdf = Pdf::loadView('pdf_tlac', compact('ponuka'));
+        return $pdf->stream('ponuka_'.$ponuka->id.'.pdf');
+}
+
+public function delete($id)
+    {
+        try {
+            $ponuka = Ponuka::findOrFail($id);
+            // Toto funguje, lebo to ide cez reláciu definovanú v modeli Ponuka
+            $ponuka->polozky()->delete();
+            $ponuka->delete();
+            
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+}
+
 public function deleteMultiple(Request $request)
     {
         try {
             $ids = $request->ids;
             if (!empty($ids)) {
-                // Zmažeme položky všetkých vybraných ponúk
-                \App\Models\PonukaItem::whereIn('offer_id', $ids)->delete();
-                // Zmažeme ponuky
+                // OPRAVA: Uisti sa, že v DB je to 'offer_id' (podľa tvojho modelu PonukaItem)
+                PonukaItem::whereIn('offer_id', $ids)->delete();
                 Ponuka::whereIn('id', $ids)->delete();
             }
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 
-            'message' => $e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 }
-
-
-public function index()
-{
-        $zakaznici = \App\Models\Zakaznik::all(); 
-        return view('ponuka', compact('zakaznici'));
-    }
-
-    public function archiv()
-    {
-        // Tu načítame ponuky zoraďené od najnovšej
-        $ponuky = Ponuka::orderBy('created_at', 'desc')->get();
-        return view('archiv', compact('ponuky'));
-}
-
-public function show($id)
-{
-    // Načítame ponuku aj s položkami
-    $ponuka = Ponuka::with('polozky')->findOrFail($id);
-    $zakaznici = \App\Models\Zakaznik::all(); 
-
-    // Vrátime ten istý pohľad, kde tvoríš ponuky
-    return view('ponuka', compact('ponuka', 'zakaznici'));
-}
-
-public function generatePdf($id)
-{
-    // 1. Načítame dáta z databázy aj s položkami
-    $ponuka = Ponuka::with('polozky')->findOrFail($id);
-
-    // 2. TENTO RIADOK TI CHÝBAL: Pripravíme PDF z view 'pdf_tlac'
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf_tlac', compact('ponuka'));
-
-    // 3. Pošleme PDF do prehliadača
-    return $pdf->stream('ponuka_'.$ponuka->id.'.pdf');
-}
-}
+} // Koniec triedy
