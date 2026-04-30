@@ -27,7 +27,7 @@ Route::post('/delete-multiple-ponuky', [PonukaController::class, 'deleteMultiple
 // Detail, PDF a Excel
 Route::get('/archiv/detail/{id}', [PonukaController::class, 'show']);
 Route::get('/ponuka/pdf/{id}', [PonukaController::class, 'generatePdf'])->name('ponuka.pdf');
-Route::get('/ponuka/excel/{id}', [PonukaController::class, 'exportExcel'])->name('ponuka.excel');
+Route::get('ponuka/excel/{id}', [PonukaController::class, 'exportExcel']);
 Route::post('/archiv/update-title', [PonukaController::class, 'updateTitle']);
 
 // --- PRODUKTY (Sklad) ---

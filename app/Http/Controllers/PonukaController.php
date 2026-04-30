@@ -91,38 +91,182 @@ return response()->json([
 }      
 
 public function exportExcel($id)
-    {
+{
     $ponuka = Ponuka::with('polozky')->findOrFail($id);
     $templatePath = storage_path('app/templates/template_cp.xlsx');
 
     if (!file_exists($templatePath)) {
-        return abort(404, 'Šablóna sa nenašla.');
+        dd($templatePath);
     }
 
     $spreadsheet = IOFactory::load($templatePath);
     $sheet = $spreadsheet->getActiveSheet();
 
-    // Hlavné údaje
-    $sheet->setCellValue('M3', $ponuka->id . '/2026');
-    $sheet->setCellValue('B10', $ponuka->customer_name); 
-    $sheet->setCellValue('B11', $ponuka->title);
+    // HLAVIČKA
+    $menoZakaznika = trim(explode(',', $ponuka->customer_name)[0]);
+    $zakaznik = \App\Models\Zakaznik::where('meno', $menoZakaznika)->first();
 
-    // Položky
-    $startRow = 15; 
-    foreach ($ponuka->polozky as $index => $polozka) {
-        $currentRow = $startRow + $index;
-        
-        $sheet->setCellValue('A' . $currentRow, $index + 1);
-        $sheet->setCellValue('B' . $currentRow, $polozka->product_name); // ZMENA na product_name
-        $sheet->setCellValue('G' . $currentRow, $polozka->quantity);     // ZMENA na quantity
-        $sheet->setCellValue('H' . $currentRow, $polozka->price_mj);
-        $sheet->setCellValue('J' . $currentRow, $polozka->z_zaklad . '%'); // ZMENA na z_zaklad
-        $sheet->setCellValue('L' . $currentRow, $polozka->row_total);    // ZMENA na row_total
+    if ($zakaznik) {
+        $odberatel =
+            $zakaznik->meno . "\n" .
+            $zakaznik->ulica . "\n" .
+            $zakaznik->psc . " " . $zakaznik->mesto . "\n" .
+            "IČO: " . $zakaznik->ico . "   DIČ: " . $zakaznik->dic;
+    } else {
+        $odberatel = $ponuka->customer_name;
     }
 
-    $sheet->setCellValue('L45', $ponuka->total_sum); 
+    $sheet->setCellValue('G5', $odberatel);
+    $sheet->getStyle('G5')->getAlignment()->setWrapText(true);
+
+    $sheet->setCellValue('M3', $ponuka->id . '/2026');
+    $sheet->setCellValue('E6', $ponuka->created_at ? $ponuka->created_at->format('d.m.Y') : now()->format('d.m.Y'));
+
+    // POLOŽKY
+$startRow = 10;
+$pocetPoloziek = count($ponuka->polozky);
+
+// vždy chceme: položky + 1 prázdna dvojica
+$pocetDvojic = $pocetPoloziek + 1;
+
+// šablóna už má 2 dvojice: 9-10 a 11-12
+$extraDvojice = max(0, $pocetDvojic - 2);
+
+if ($extraDvojice > 0) {
+    $sheet->insertNewRowBefore(13, $extraDvojice * 2);
+}
+
+// pomocná funkcia: kopíruje formát bunku po bunke
+$copyPairStyle = function ($sourceTop, $destTop) use ($sheet) {
+    foreach (range('A', 'O') as $col) {
+        $sheet->duplicateStyle($sheet->getStyle($col . $sourceTop), $col . $destTop);
+        $sheet->duplicateStyle($sheet->getStyle($col . ($sourceTop + 1)), $col . ($destTop + 1));
+    }
+
+    $sheet->getRowDimension($destTop)->setRowHeight($sheet->getRowDimension($sourceTop)->getRowHeight());
+    $sheet->getRowDimension($destTop + 1)->setRowHeight($sheet->getRowDimension($sourceTop + 1)->getRowHeight());
+};
+
+$sumCells = [];
+
+// najprv nastavíme formát všetkým dvojiciam vrátane prázdnej
+for ($i = 0; $i < $pocetDvojic; $i++) {
+    $topRow = 9 + ($i * 2);
+
+    // 0 = sivá z 9-10, 1 = biela z 11-12, 2 = sivá...
+    $sourceTop = ($i % 2 === 0) ? 9 : 11;
+
+    $copyPairStyle($sourceTop, $topRow);
+
+    // vyčisti obsah dvojice, formát ostane
+    foreach (range('A', 'O') as $col) {
+        $sheet->setCellValue($col . $topRow, '');
+        $sheet->setCellValue($col . ($topRow + 1), '');
+    }
+}
+
+foreach ($ponuka->polozky as $index => $polozka) {
+    $currentRow = $startRow + ($index * 2);
+    $topRow = $currentRow - 1;
+
+    $data = $polozka->product_data;
+
+    if (is_string($data)) {
+        $data = json_decode($data, true);
+    }
+
+    $merj = $data['merj'] ?? '';
+
+    if ($data) {
+        $sheet->setCellValue('A' . $topRow, $data['id_vyrobok'] ?? '');
+    }
+
+    $sheet->setCellValue('A' . $currentRow, $index + 1);
+
+    $nazov = str_replace('/', '', $polozka->product_name);
+    $sheet->setCellValue('C' . $topRow, trim($nazov));
+
+    if ($data) {
+        $sheet->setCellValue('C' . $currentRow, 'celé balenie: ' . ($data['mn_cele_balenie'] ?? ''));
+    }
+
+    $sheet->setCellValue('E' . $topRow, $polozka->quantity);
+    $sheet->getStyle('E' . $topRow)
+        ->getNumberFormat()
+        ->setFormatCode('# ##0 "' . $merj . '"');
+
+    if ($data) {
+        $sheet->setCellValue('E' . $currentRow, $data['rozmer_balenie'] ?? 0);
+        $sheet->getStyle('E' . $currentRow)
+            ->getNumberFormat()
+            ->setFormatCode('# ##0 "' . $merj . '/ks"');
+    }
+
+    $sheet->setCellValue('G' . $topRow, $polozka->price_mj);
+    $sheet->getStyle('G' . $topRow)
+        ->getNumberFormat()
+        ->setFormatCode('# ##0.00 "€/' . $merj . '"');
+
+    if ($data && ($data['merj'] ?? '') !== 'ks') {
+        $rozmer = (float)($data['rozmer_balenie'] ?? 0);
+        $cena = (float)($polozka->price_mj ?? 0);
+
+        $sheet->setCellValue('G' . $currentRow, $cena * $rozmer);
+        $sheet->getStyle('G' . $currentRow)
+            ->getNumberFormat()
+            ->setFormatCode('# ##0.00 "€/ks"');
+    }
+
+    $sheet->setCellValue('I' . $topRow, (float)($polozka->z_zaklad ?? 0));
+    $sheet->getStyle('I' . $topRow)
+        ->getNumberFormat()
+        ->setFormatCode('0 "%"');
+
+    $sheet->setCellValue('K' . $topRow, (float)($polozka->z_objekt ?? 0));
+    $sheet->getStyle('K' . $topRow)
+        ->getNumberFormat()
+        ->setFormatCode('0 "%"');
+
+    $sheet->setCellValue('M' . $topRow, '=G' . $topRow . '*(100-I' . $topRow . ')/100');
+    $sheet->getStyle('M' . $topRow)
+        ->getNumberFormat()
+        ->setFormatCode('# ##0.00 "€"');
+
+    if (($data['merj'] ?? '') !== 'ks') {
+        $sheet->setCellValue('M' . $currentRow, '=G' . $currentRow . '*(100-I' . $currentRow . ')/100');
+        $sheet->getStyle('M' . $currentRow)
+            ->getNumberFormat()
+            ->setFormatCode('# ##0.00 "€"');
+    }
+
+    $sheet->setCellValue('O' . $topRow, '=E' . $topRow . '*M' . $topRow . '*(100-K' . $topRow . ')/100');
+    $sheet->getStyle('O' . $topRow)
+        ->getNumberFormat()
+        ->setFormatCode('# ##0.00 "€"');
+
+    $sumCells[] = 'O' . $topRow;
+}
+
+// SUMÁR
+$summaryRow = 14 + ($extraDvojice * 2);
+
+$sheet->setCellValue('M' . $summaryRow, 'spolu bez DPH');
+$sheet->setCellValue('O' . $summaryRow, '=SUM(' . implode(',', $sumCells) . ')');
+
+$sheet->setCellValue('M' . ($summaryRow + 1), 'DPH 23%');
+$sheet->setCellValue('O' . ($summaryRow + 1), '=O' . $summaryRow . '*0.23');
+
+$sheet->setCellValue('M' . ($summaryRow + 2), 'spolu s DPH');
+$sheet->setCellValue('O' . ($summaryRow + 2), '=O' . $summaryRow . '+O' . ($summaryRow + 1));
+
+foreach (['O' . $summaryRow, 'O' . ($summaryRow + 1), 'O' . ($summaryRow + 2)] as $cell) {
+    $sheet->getStyle($cell)
+        ->getNumberFormat()
+        ->setFormatCode('# ##0.00 "€"');
+}
 
     $fileName = "Ponuka_" . $ponuka->id . ".xlsx";
+
     return response()->streamDownload(function () use ($spreadsheet) {
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save('php://output');
@@ -130,6 +274,7 @@ public function exportExcel($id)
         'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ]);
 }
+
 
 public function generatePdf($id)
     {
