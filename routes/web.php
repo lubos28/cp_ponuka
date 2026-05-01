@@ -14,7 +14,11 @@ Route::get('/', function () {
 // 🔐 všetko zamknuté
 Route::middleware(['auth'])->group(function () {
 
-    // --- PONUKA ---
+    Route::get('/dashboard', function () {
+        return redirect('/ponuka');
+    })->name('dashboard');
+
+// --- PONUKA ---
     Route::get('/nova-ponuka', [PonukaController::class, 'index']);
     Route::get('/ponuka', [PonukaController::class, 'index']);
 
