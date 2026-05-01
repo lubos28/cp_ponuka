@@ -123,9 +123,9 @@
         <b>DÖRKEN</b>
         <div class="nav-links">
             <a href="/ponuka" class="active">NOVÁ PONUKA</a>
-            <a href="{{ url('/zakaznici') }}">ZÁKAZNÍCI</a>
-            <a href="{{ url('/produkty') }}">PRODUKTY</a>
-            <a href="{{ url('/archiv') }}">ARCHÍV</a>
+            <a href="{{ /zakaznici }}">ZÁKAZNÍCI</a>
+            <a href="{{ /produkty }}">PRODUKTY</a>
+            <a href="{{ /archiv }}">ARCHÍV</a>
         </div>
     </div>
 </div>
@@ -287,7 +287,7 @@ function searchProduct(e, input, id) {
     currentFocus = -1;
     let term = input.value.trim();
 
-    axios.get("{{ url('/search-products') }}", { params: { term: term, open_all: 1 } })
+    axios.get("{{ /search-products }}", { params: { term: term, open_all: 1 } })
     .then(res => {
         div.innerHTML = '';
         let products = Array.isArray(res.data) ? res.data : (res.data.data || []);
