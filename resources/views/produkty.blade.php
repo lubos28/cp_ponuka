@@ -187,7 +187,7 @@ aj s uchytenim
         <div class="navbar-inner">
             <b>DÖRKEN</b>
             <div class="nav-links">
-                <a href="{{ url('/ponuka') }}">PONUKA</a>
+                <a href="/ponuka">PONUKA</a>
                 <a href="{{ url('/zakaznici') }}">ZÁKAZNÍCI</a>
                 <a href="{{ url('/produkty') }}" class="active">PRODUKTY</a>
                 <a href="{{ url('/archiv') }}">ARCHÍV</a>
@@ -197,7 +197,7 @@ aj s uchytenim
         <div class="action-bar">
             <h2 style="margin:0; color:var(--dorken)">Sklad produktov</h2>
             <div class="management-tools">
-                <form action="{{ url('/produkty/import') }}" method="POST" enctype="multipart/form-data" class="import-box" style="margin:0">
+                <form action="/produkty/import" method="POST" enctype="multipart/form-data" class="import-box" style="margin:0">
                     @csrf
                     <input type="file" name="excel_file" required style="font-size:11px">
                     <button type="submit" class="btn btn-success">Import</button>

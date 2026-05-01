@@ -122,7 +122,7 @@
     <div class="navbar-inner">
         <b>DÖRKEN</b>
         <div class="nav-links">
-            <a href="{{ url('/ponuka') }}" class="active">NOVÁ PONUKA</a>
+            <a href="/ponuka" class="active">NOVÁ PONUKA</a>
             <a href="{{ url('/zakaznici') }}">ZÁKAZNÍCI</a>
             <a href="{{ url('/produkty') }}">PRODUKTY</a>
             <a href="{{ url('/archiv') }}">ARCHÍV</a>
