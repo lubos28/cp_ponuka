@@ -657,9 +657,9 @@ function searchProducts(input, id) {
 
     searchTimeout = setTimeout(() => {
 
-        axios.get(BASE_URL + '/search-products', {
-            params: { q }
-        })
+    axios.get('/search-products', {
+        params: { q }
+    })
         .then(res => {
             box.innerHTML = '';
             if (!res.data.length) {
