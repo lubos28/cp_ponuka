@@ -11,11 +11,16 @@ if (!class_exists('SimpleXLSX')) {
 
 class ProductController extends Controller
 {
-    public function index() {
-        // Zmeníme 'nazov' na 'id'
+   public function index() {
+    try {
         $produkty = DB::table('products')->orderBy('id', 'asc')->get();
+        } catch (\Exception $e) 
+        {
+         // Ak tabuľka neexistuje, vrátime prázdne pole, aby Blade nezhavaroval
+         $produkty = collect(); 
+        }
         return view('produkty', compact('produkty'));
-    }   
+    }
 
     public function import(Request $request) {
         if (!$request->hasFile('excel_file')) return redirect()->back()->with('error', 'Vyberte súbor');

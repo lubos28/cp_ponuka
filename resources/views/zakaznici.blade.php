@@ -4,77 +4,238 @@
     <meta charset="UTF-8">
     <title>Databáza zákazníkov | DÖRKEN</title>
     <style>
-   
+:root {
+    --dorken: #003399;
+    --bg: #f0f2f5;
+}
 
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg);
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+}
 
-        :root {
-            --dorken: #003399;
-            --bg: #f0f2f5;
-        }
+.navbar {
+    background: var(--dorken);
+    color: #fff;
+    padding: 8px 0;
+}
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; font-size: 13px; }
-        
-        .navbar {
-            background: var(--dorken);
-            color: #fff;
-            padding: 10px 0; /* Kompaktná výška */
-        }
+.navbar-inner {
+    max-width: 1500px;
+    margin: auto;
+    padding: 0 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .navbar-inner {
-            max-width: 1500px; /* Zjednotená šírka na 1500px */
-            margin: auto;
-            padding: 0 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.navbar-inner b {
+    font-size: 14px;
+}
 
-        .navbar-inner b {
-            font-size: 14px; /* Logo Dörken */
-        }
+.nav-links a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: bold;
+    font-size: 11px;
+    opacity: .8;
+}
 
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            margin-left: 20px;
-            font-weight: bold;
-            font-size: 11px; /* Malé, čisté písmo */
-            opacity: .8;
-        }
+.nav-links a.active {
+    opacity: 1;
+    border-bottom: 2px solid white;
+    padding-bottom: 2px;
+}
 
-        .nav-links a.active {
-            opacity: 1 !important;
-            border-bottom: 2px solid white;
-            padding-bottom: 2px;
-        }
+.nav-links a:hover {
+    opacity: 1;
+}
 
-        .nav-links a:hover { opacity: 1; }
-        .nav-links a.active { opacity: 1; border-bottom: 2px solid white; }
+.container {
+    max-width: 1550px;
+    margin: 12px auto;
+    background: white;
+    padding: 16px 20px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
 
-        .container { max-width: 1550px; margin: 20px auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        
-        .add-box { background: #f8f9fa; border: 1px solid #ddd; padding: 20px; border-radius: 6px; margin-bottom: 30px; }
-        .btn-save { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #343a40; color: white; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #eee; transition: background 0.3s; }
-        tr:hover { background: #f1f7ff; }
+.page-title {
+    color: var(--dorken);
+    font-size: 20px;
+    margin: 0 0 12px 0;
+}
 
-        /* Štýl pre editovateľnú bunku */
-        [contenteditable="true"]:focus {
-            outline: 2px solid var(--dorken);
-            background: white;
-            padding: 5px;
-            border-radius: 3px;
-        }
+.add-box {
+    background: white;
+    border: 1px solid #d1d9e6;
+    padding: 0;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.04);
+}
 
-        .badge { background: #fffde7; border: 1px solid #ffd600; padding: 3px 7px; border-radius: 3px; font-weight: bold; color: #856404; }
-        .alert-success { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #c3e6cb; }
-        
-        
-    
-    </style>
+.add-header {
+    background: var(--dorken);
+    color: white;
+    padding: 7px 14px;
+    font-weight: bold;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.add-header-title {
+    letter-spacing: .2px;
+}
+
+.add-form {
+    padding: 12px 14px 14px;
+    background: white;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.section-title {
+    margin: 0 0 7px 0;
+    font-size: 10px;
+    color: var(--dorken);
+    border-bottom: 1px solid #e5e8ef;
+    padding-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.field-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+}
+
+.row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.row-city {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 8px;
+}
+
+.row-business {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+label {
+    font-size: 9px;
+    color: #777;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 2px;
+}
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 6px;
+    border: 1px solid #c9ced8;
+    border-radius: 3px;
+    font-size: 12px;
+    height: 26px;
+}
+
+input:focus {
+    outline: 2px solid rgba(0,51,153,0.18);
+    border-color: var(--dorken);
+}
+
+.discount-label {
+    color: #b00;
+}
+
+.discount-input {
+    font-weight: bold;
+}
+
+.btn-save {
+    background: white;
+    color: var(--dorken);
+    border: none;
+    padding: 5px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.btn-save:hover {
+    background: #eef3ff;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+}
+
+th {
+    background: #343a40;
+    color: white;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.3s;
+}
+
+tr:hover {
+    background: #f1f7ff;
+}
+
+[contenteditable="true"]:focus {
+    outline: 2px solid var(--dorken);
+    background: white;
+    padding: 4px;
+    border-radius: 3px;
+}
+
+.badge {
+    background: #fffde7;
+    border: 1px solid #ffd600;
+    padding: 3px 7px;
+    border-radius: 3px;
+    font-weight: bold;
+    color: #856404;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    padding: 8px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    border: 1px solid #c3e6cb;
+}
+</style>
 
     <script>
         document.addEventListener('keydown', function (e) {
@@ -129,103 +290,108 @@
 </nav>
 
 <div class="container">
-    <h1 style="color:var(--dorken)">👥 Správa zákazníkov</h1>
+    <h1 class="page-title">👥 Správa zákazníkov</h1>
 
     @if(session('success'))
         <div class="alert-success">{{ session('success') }}</div>
     @endif
 
-   <div class="add-box" style="background: white; border: 1px solid #d1d9e6; padding: 0; border-radius: 8px; margin-bottom: 25px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-    <div style="background: var(--dorken); color: white; padding: 10px 20px; font-weight: bold; font-size: 13px;">
-        ➕ NOVÝ ZÁKAZNÍK
+    <div class="add-box">
+        <form action="{{ url('/zakaznici/store') }}" method="POST">
+            @csrf
+
+            <div class="add-header">
+                <div class="add-header-title">➕ NOVÝ ZÁKAZNÍK</div>
+                <button type="submit" class="btn-save">💾 ULOŽIŤ</button>
+            </div>
+
+            <div class="add-form">
+                <div class="form-grid">
+
+                    <div>
+                        <h4 class="section-title">Identifikácia a sídlo</h4>
+
+                        <div class="field-grid">
+                            <div>
+                                <label>Názov spoločnosti / Meno *</label>
+                                <input type="text" name="meno" required onfocus="this.select()">
+                            </div>
+
+                            <div class="row-2">
+                                <div>
+                                    <label>IČO</label>
+                                    <input type="text" name="ico" onfocus="this.select()">
+                                </div>
+                                <div>
+                                    <label>DIČ</label>
+                                    <input type="text" name="dic" onfocus="this.select()">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label>Ulica a číslo</label>
+                                <input type="text" name="ulica" onfocus="this.select()">
+                            </div>
+
+                            <div class="row-city">
+                                <div>
+                                    <label>Mesto</label>
+                                    <input type="text" name="mesto" onfocus="this.select()">
+                                </div>
+                                <div>
+                                    <label>PSČ</label>
+                                    <input type="text" name="psc" onfocus="this.select()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="section-title">Kontakt a obchod</h4>
+
+                        <div class="field-grid">
+                            <div>
+                                <label>Kontaktná osoba</label>
+                                <input type="text" name="kontakt_meno" onfocus="this.select()">
+                            </div>
+
+                            <div class="row-2">
+                                <div>
+                                    <label>Telefón</label>
+                                    <input type="text" name="telefon" onfocus="this.select()">
+                                </div>
+                                <div>
+                                    <label>E-mail</label>
+                                    <input type="email" name="email" onfocus="this.select()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row-business">
+                            <div>
+                                <label>Typ / Sieť</label>
+                                <input type="text" name="typ" onfocus="this.select()" placeholder="Klient / Sieť">
+                            </div>
+                            <div>
+                                <label class="discount-label">Zľava Zákl. %</label>
+                                <input class="discount-input" type="number" name="default_discount_base" onfocus="this.select()" step="0.1" value="0">
+                            </div>
+                            <div>
+                                <label class="discount-label">Zľava Obj. %</label>
+                                <input class="discount-input" type="number" name="default_discount_obj" onfocus="this.select()" step="0.1" value="0">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 7px;">
+                            <label>Interná poznámka</label>
+                            <input type="text" name="poznamka" onfocus="this.select()">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
     </div>
-        
-    <form action="{{ url('/zakaznici/store') }}" method="POST" style="padding: 20px; background: white;">
-        @csrf
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-            
-            <div>
-                <h4 style="margin: 0 0 10px 0; font-size: 11px; color: var(--dorken); border-bottom: 1px solid #eee; padding-bottom: 5px;">IDENTIFIKÁCIA A SÍDLO</h4>
-                <div style="display: grid; grid-template-columns: 1fr; gap: 8px;">
-                    <div>
-                        <label style="font-size: 10px; color: #888; font-weight: bold;">Názov spoločnosti / Meno *</label>
-                        <input type="text" name="meno" required onfocus="this.select()" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div>
-                            <label style="font-size: 10px; color: #888; font-weight: bold;">IČO</label>
-                            <input type="text" name="ico" onfocus="this.select()" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                        </div>
-                        <div>
-                            <label style="font-size: 10px; color: #888; font-weight: bold;">DIČ</label>
-                            <input type="text" name="dic" onfocus="this.select()" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                        </div>
-                    </div>
-                    <div>
-                        <label style="font-size: 10px; color: #888; font-weight: bold;">Ulica a číslo</label>
-                        <input type="text" name="ulica" onfocus="this.select()" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                    </div>
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
-                        <div>
-                            <label style="font-size: 10px; color: #888; font-weight: bold;">Mesto</label>
-                            <input type="text" name="mesto" onfocus="this.select()" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                        </div>
-                        <div>
-                            <label style="font-size: 10px; color: #888; font-weight: bold;">PSČ</label>
-                            <input type="text" name="psc" onfocus="this.select()" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <h4 style="margin: 0 0 10px 0; font-size: 11px; color: var(--dorken); border-bottom: 1px solid #eee; padding-bottom: 5px;">KONTAKT A OBCHOD</h4>
-                <div style="display: grid; grid-template-columns: 1fr; gap: 8px;">
-                    <div>
-                        <label style="font-size: 10px; color: #888; font-weight: bold;">Kontaktná osoba</label>
-                        <input type="text" name="kontakt_meno" onfocus="this.select()" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div>
-                            <label style="font-size: 10px; color: #888; font-weight: bold;">Telefón</label>
-                            <input type="text" name="telefon" onfocus="this.select()" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                        </div>
-                        <div>
-                            <label style="font-size: 10px; color: #888; font-weight: bold;">E-mail</label>
-                            <input type="email" name="email" onfocus="this.select()" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                        </div>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 10px; margin-top: 15px;">
-                    <div>
-                        <label style="font-size: 10px; color: #888; font-weight: bold;">Typ / Sieť</label>
-                        <input type="text" name="typ" onfocus="this.select()" placeholder="Klient / Sieť" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                    </div>
-                    <div>
-                        <label style="font-size: 10px; color: #b00; font-weight: bold;">Zľava Zákl. %</label>
-                        <input type="number" name="default_discount_base" onfocus="this.select()" step="0.1" value="0" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px; font-weight:bold;">
-                    </div>
-                    <div>
-                        <label style="font-size: 10px; color: #b00; font-weight: bold;">Zľava Obj. %</label>
-                        <input type="number" name="default_discount_obj" onfocus="this.select()" step="0.1" value="0" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px; font-weight:bold;">
-                    </div>
-                </div>
-                <div style="margin-top: 10px;">
-                    <label style="font-size: 10px; color: #888; font-weight: bold;">Interná poznámka</label>
-                    <input type="text" name="poznamka" onfocus="this.select()" style="width:100%; padding:5px; border: 1px solid #ccc; border-radius:3px;">
-                </div>
-            </div>
-        </div>
-
-        <div style="margin-top: 20px; text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
-            <button type="submit" class="btn-save" style="background: var(--dorken); color: white; border: none; padding: 10px 40px; font-size: 13px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                💾 ULOŽIŤ ZÁKAZNÍKA
-            </button>
-        </div>
-    </form>
-</div>
 
     <table>
         <thead>
@@ -240,7 +406,17 @@
         </thead>
         <tbody>
             @forelse($zakaznici as $z)
-                <tr data-id="{{ $z->id }}">
+                <tr data-id="{{ $z->id }}"
+                        data-search="{{ strtolower(
+                            ($z->meno ?? '') . ' ' .
+                            ($z->ico ?? '') . ' ' .
+                            ($z->dic ?? '') . ' ' .
+                            ($z->mesto ?? '') . ' ' .
+                            ($z->kontakt_meno ?? '') . ' ' .
+                            ($z->telefon ?? '') . ' ' .
+                            ($z->email ?? '') . ' ' .
+                            ($z->typ ?? '')
+                        ) }}">
                     <td contenteditable="true" onfocus="selectText(this)" onblur="updateLive(this, 'meno')" onkeydown="checkEnter(event, this)"><strong>{{ $z->meno }}</strong></td>
                     <td contenteditable="true" onfocus="selectText(this)" onblur="updateLive(this, 'ico')" onkeydown="checkEnter(event, this)">{{ $z->ico ?? '' }}</td>
                     <td contenteditable="true" onfocus="selectText(this)" onblur="updateLive(this, 'mesto')" onkeydown="checkEnter(event, this)">{{ $z->mesto ?? '' }}</td>
@@ -256,6 +432,8 @@
             @endforelse
         </tbody>
     </table>
+    //info o filtrovani
+    <div id="filterInfo" style="font-size:11px; color:#777; margin-top:6px;"></div>
 </div>
 
 <script>
@@ -329,6 +507,64 @@ function updateLive(cell, field) {
 
 }
 
+//filtrovanie v zadavani
+// Formulár nového zákazníka zároveň filtruje existujúcich zákazníkov
+const customerForm = document.querySelector('.add-box form');
+const customerRows = document.querySelectorAll('tbody tr[data-search]');
+const filterInfo = document.getElementById('filterInfo');
+
+function normalizeText(text) {
+    return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
+}
+
+function filterCustomersFromForm() {
+    const inputs = customerForm.querySelectorAll('input');
+
+    let searchParts = [];
+
+    inputs.forEach(input => {
+        if (
+            input.name !== '_token' &&
+            input.value.trim() !== '' &&
+            input.type !== 'number'
+        ) {
+            searchParts.push(input.value);
+        }
+    });
+
+    const searchText = normalizeText(searchParts.join(' '));
+
+    let visibleCount = 0;
+
+    customerRows.forEach(row => {
+        const rowText = normalizeText(row.getAttribute('data-search') || '');
+
+        if (searchText === '' || rowText.includes(searchText)) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    if (searchText === '') {
+        filterInfo.innerText = '';
+    } else if (visibleCount === 0) {
+        filterInfo.innerText = 'Nenašiel sa žiadny existujúci zákazník – môžeš pridať nového.';
+    } else if (visibleCount === 1) {
+        filterInfo.innerText = 'Nájdený 1 podobný zákazník.';
+    } else {
+        filterInfo.innerText = 'Nájdených podobných zákazníkov: ' + visibleCount;
+    }
+}
+
+customerForm.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', filterCustomersFromForm);
+});
 
 
 </script>
