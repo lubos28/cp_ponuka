@@ -290,9 +290,9 @@
             <b>DÖRKEN</b>
            <div class="nav-links">
                 <a href="/ponuka" class="active">PONUKA</a>
-                <a href="{{ /zakaznici }}">ZÁKAZNÍCI</a>
-                <a href="{{ /produkty }}">PRODUKTY</a>
-                <a href="{{ /archiv }}">ARCHÍV</a>
+                <a href="/zakaznici">ZÁKAZNÍCI</a>
+                <a href="/produkty">PRODUKTY</a>
+                <a href="/archiv">ARCHÍV</a>
             </div>
         </div>
     </div>
@@ -914,7 +914,7 @@ function saveOffer(prepisat = false) {
                 
 
                 setTimeout(() => {
-                    window.location.href = "{{ /archiv }}";
+                    window.location.href = "/archiv ";
                 }, 600);
             }
         })

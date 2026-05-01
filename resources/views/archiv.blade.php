@@ -198,9 +198,9 @@ tr:hover{
         <b>DÖRKEN</b>
         <div class="nav-links">
             <a href="/ponuka">PONUKA</a>
-            <a href="{{ /zakaznici }}">ZÁKAZNÍCI</a>
-            <a href="{{ /produkty }}">PRODUKTY</a>
-            <a href="{{ /archiv }}" class="active">ARCHÍV</a>
+            <a href="/zakaznici">ZÁKAZNÍCI</a>
+            <a href="/produkty">PRODUKTY</a>
+            <a href="/archiv" class="active">ARCHÍV</a>
         </div>
     </div>
 </div>

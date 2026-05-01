@@ -240,9 +240,9 @@
         <b>DÖRKEN</b>
         <div class="nav-links">
             <a href="/ponuka">PONUKA</a>
-            <a href="{{ /zakaznici }}" class="active">ZÁKAZNÍCI</a>
-            <a href="{{ /produkty }}">PRODUKTY</a>
-            <a href="{{ /archiv }}">ARCHÍV</a>
+            <a href="/zakaznici" class="active">ZÁKAZNÍCI</a>
+            <a href="/produkty">PRODUKTY</a>
+            <a href="/archiv">ARCHÍV</a>
         </div>
     </div>
 </div>
@@ -257,7 +257,7 @@
         <div class="edit-title">✏️ Upraviť zákazníka: {{ $zakaznik->meno }}</div>
 
         <div class="edit-actions">
-            <a href="{{ /zakaznici }}" class="btn-back">⬅ SPÄŤ</a>
+            <a href="/zakaznici" class="btn-back">⬅ SPÄŤ</a>
         </div>
     </div>
 

@@ -188,9 +188,9 @@ aj s uchytenim
             <b>DÖRKEN</b>
             <div class="nav-links">
                 <a href="/ponuka">PONUKA</a>
-                <a href="{{ /zakaznici }}">ZÁKAZNÍCI</a>
-                <a href="{{ /produkty }}" class="active">PRODUKTY</a>
-                <a href="{{ /archiv }}">ARCHÍV</a>
+                <a href="/zakaznici">ZÁKAZNÍCI</a>
+                <a href="/produkty" class="active">PRODUKTY</a>
+                <a href="/archiv">ARCHÍV</a>
             </div>
         </div>
     </div> <div class="container-tools">
@@ -202,7 +202,7 @@ aj s uchytenim
                     <input type="file" name="excel_file" required style="font-size:11px">
                     <button type="submit" class="btn btn-success">Import</button>
                 </form>
-                <form action="{{ /produkty/reset }}" method="POST" onsubmit="return confirm('Vymazať sklad?');" style="margin:0">
+                <form action="/produkty/reset" method="POST" onsubmit="return confirm('Vymazať sklad?');" style="margin:0">
                     @csrf
                     <button type="submit" class="btn btn-danger">Vymazať</button>
                 </form>
